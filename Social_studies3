@@ -1,111 +1,101 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>ค้นหาคะแนนเก็บนักเรียน</title>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
-    body {
-      font-family: "Prompt", sans-serif;
-      background: #f0f8ff;
-      padding: 20px;
-      text-align: center;
-    }
-    h1 { color: #003366; }
-    input, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-    }
-    button {
-      background: #003366;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover { background: #0055aa; }
-    #result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 10px;
-      background: white;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      display: none;
-      max-width: 90%;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: left;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px;
-      text-align: center;
-    }
-    th {
-      background: #003366;
-      color: white;
-    }
-  </style>
+  <base target="_top">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body>
-  <h1>ค้นหาคะแนนเก็บนักเรียน</h1>
-  <input type="text" id="studentId" placeholder="กรอกรหัสประจำตัว" />
-  <button onclick="search()">ค้นหา</button>
+<body class="container py-4">
+  <h2 class="mb-4">Checkpoints</h2>
+  <p>คะแนนเก็บ วิชาสังคมศึกษา รหัสวิชา ส32101</p>
 
-  <div id="result"></div>
+  <form id="searchForm" class="row g-3 mb-4">
+    <div class="col-auto">
+      <input type="text" id="studentId" class="form-control" placeholder="กรอกเลขประจำตัวนักเรียน">
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">ค้นหา</button>
+    </div>
+  </form>
+
+  <table id="resultTable" class="table table-bordered table-striped d-none">
+    <thead>
+      <tr>
+        <th>ห้อง</th>
+        <th>เลขที่</th>
+        <th>เลขประจำตัว</th>
+        <th>ชื่อ-สกุล</th>
+        <th>สมุด</th>
+        <th>ส1</th>
+        <th>ต้มยำ</th>
+        <th>รวม1</th>
+        <th>ช10</th>
+        <th>ผล5</th>
+        <th>ประยุกต์</th>
+        <th>รวม2</th>
+        <th>รวม3</th>
+        <th>ส20</th>
+        <th>ซ่อม</th>
+        <th>รวม4</th>
+        <th>ชุมชน</th>
+        <th>RCEP</th>
+        <th>รวม5</th>
+        <th>Test</th>
+        <th>ใบงาน</th>
+        <th>รวม6</th>
+        <th>รวม7</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <script>
-    function search() {
+    document.getElementById("searchForm").addEventListener("submit", function(e){
+      e.preventDefault();
       const studentId = document.getElementById("studentId").value.trim();
-      if (!studentId) {
-        Swal.fire("แจ้งเตือน", "กรุณากรอกรหัสประจำตัว", "warning");
-        return;
+      if (!studentId) return;
+
+      google.script.run.withSuccessHandler(showResults).searchStudent(studentId);
+    });
+
+    function showResults(data) {
+      const table = document.getElementById("resultTable");
+      const tbody = table.querySelector("tbody");
+      tbody.innerHTML = "";
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="23" class="text-center text-danger">ไม่พบข้อมูล</td></tr>`;
+      } else {
+        data.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row["ห้อง"] || ""}</td>
+            <td>${row["เลขที่"] || ""}</td>
+            <td>${row["เลขประจำตัว"] || ""}</td>
+            <td>${row["ชื่อ-สกุล"] || ""}</td>
+            <td>${row["สมุด"] || ""}</td>
+            <td>${row["ส1"] || ""}</td>
+            <td>${row["ต้มยำ"] || ""}</td>
+            <td>${row["รวม1"] || ""}</td>
+            <td>${row["ช10"] || ""}</td>
+            <td>${row["ผล5"] || ""}</td>
+            <td>${row["ประยุกต์"] || ""}</td>
+            <td>${row["รวม2"] || ""}</td>
+            <td>${row["รวม3"] || ""}</td>
+            <td>${row["ส20"] || ""}</td>
+            <td>${row["ซ่อม"] || ""}</td>
+            <td>${row["รวม4"] || ""}</td>
+            <td>${row["ชุมชน"] || ""}</td>
+            <td>${row["RCEP"] || ""}</td>
+            <td>${row["รวม5"] || ""}</td>
+            <td>${row["Test"] || ""}</td>
+            <td>${row["ใบงาน"] || ""}</td>
+            <td>${row["รวม6"] || ""}</td>
+            <td>${row["รวม7"] || ""}</td>
+          `;
+          tbody.appendChild(tr);
+        });
       }
-
-      Swal.fire({
-        title: "กำลังค้นหา...",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
-
-      google.script.run.withSuccessHandler(function(data) {
-        Swal.close();
-        const resultDiv = document.getElementById("result");
-        if (data) {
-          // ✅ ข้อมูลพื้นฐาน
-          let html = `<h3>ข้อมูลนักเรียน</h3>
-            <p><b>ห้อง:</b> ${data["ห้อง"]}</p>
-            <p><b>เลขที่:</b> ${data["เลขที่"]}</p>
-            <p><b>เลขประจำตัว:</b> ${data["เลขประจำตัว"]}</p>
-            <p><b>ชื่อ-สกุล:</b> ${data["ชื่อ-สกุล"]}</p>`;
-
-          // ✅ หัวข้อที่เหลือ (คะแนน)
-          const keys = [
-            "สมุด","ส1","ต้มยำ","รวม1",
-            "ช10","ผล5","ประยุกต์","รวม2","รวม3",
-            "ส20","ซ่อม","รวม4","ชุมชน","RCEP","รวม5",
-            "Test","ใบงาน","รวม6","รวม7"
-          ];
-
-          html += `<h3>ตารางคะแนน</h3><table><tr>`;
-          keys.forEach(k => { html += `<th>${k}</th>`; });
-          html += `</tr><tr>`;
-          keys.forEach(k => { html += `<td>${data[k] ?? "-"}</td>`; });
-          html += `</tr></table>`;
-
-          resultDiv.innerHTML = html;
-          resultDiv.style.display = "block";
-        } else {
-          Swal.fire("ไม่พบข้อมูล", "กรุณาตรวจสอบรหัสประจำตัวอีกครั้ง", "error");
-          resultDiv.style.display = "none";
-        }
-      }).searchScore(studentId);
+      table.classList.remove("d-none");
     }
   </script>
 </body>
