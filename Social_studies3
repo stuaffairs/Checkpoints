@@ -32,10 +32,24 @@
       background: white;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       display: none;
-      text-align: left;
-      max-width: 400px;
+      max-width: 90%;
       margin-left: auto;
       margin-right: auto;
+      text-align: left;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+    }
+    th {
+      background: #003366;
+      color: white;
     }
   </style>
 </head>
@@ -64,10 +78,27 @@
         Swal.close();
         const resultDiv = document.getElementById("result");
         if (data) {
-          let html = "<h3>ข้อมูลนักเรียน</h3>";
-          for (let key in data) {
-            html += `<p><b>${key}:</b> ${data[key]}</p>`;
-          }
+          // ✅ ข้อมูลพื้นฐาน
+          let html = `<h3>ข้อมูลนักเรียน</h3>
+            <p><b>ห้อง:</b> ${data["ห้อง"]}</p>
+            <p><b>เลขที่:</b> ${data["เลขที่"]}</p>
+            <p><b>เลขประจำตัว:</b> ${data["เลขประจำตัว"]}</p>
+            <p><b>ชื่อ-สกุล:</b> ${data["ชื่อ-สกุล"]}</p>`;
+
+          // ✅ หัวข้อที่เหลือ (คะแนน)
+          const keys = [
+            "สมุด","ส1","ต้มยำ","รวม1",
+            "ช10","ผล5","ประยุกต์","รวม2","รวม3",
+            "ส20","ซ่อม","รวม4","ชุมชน","RCEP","รวม5",
+            "Test","ใบงาน","รวม6","รวม7"
+          ];
+
+          html += `<h3>ตารางคะแนน</h3><table><tr>`;
+          keys.forEach(k => { html += `<th>${k}</th>`; });
+          html += `</tr><tr>`;
+          keys.forEach(k => { html += `<td>${data[k] ?? "-"}</td>`; });
+          html += `</tr></table>`;
+
           resultDiv.innerHTML = html;
           resultDiv.style.display = "block";
         } else {
