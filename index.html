@@ -14,22 +14,41 @@
       color: #fff;
     }
     .card {
-      background: #ffffff;
+      background: #fff;
       color: #333;
       border-radius: 20px;
       padding: 30px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
       width: 95%;
-      max-width: 1000px;
+      max-width: 1100px;
       text-align: center;
     }
     h2 { font-weight: 700; color: #1e3c72; margin-bottom: 10px; }
     p.subtitle { color: #444; margin-bottom: 25px; }
-    #resultTable th { background-color: #1e3c72; color: #fff; text-align: center; }
-    #resultTable td { text-align: center; vertical-align: middle; }
-    .btn-primary { background-color: #2a5298; border: none; border-radius: 50px; padding: 10px 25px; transition: 0.3s; }
+    #resultTable th {
+      background-color: #1e3c72;
+      color: #fff;
+      text-align: center;
+      vertical-align: middle;
+    }
+    #resultTable td {
+      text-align: center;
+      vertical-align: middle;
+    }
+    .btn-primary {
+      background-color: #2a5298;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 25px;
+      transition: 0.3s;
+    }
     .btn-primary:hover { background-color: #1e3c72; }
+    .btn-warning { border-radius: 50px; }
     input.form-control { border-radius: 50px; text-align: center; }
+    @media (max-width: 768px) {
+      .card { padding: 20px; }
+      #resultTable { font-size: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -46,6 +65,9 @@
         <button type="submit" class="btn btn-primary w-100">ค้นหา</button>
       </div>
     </form>
+
+    <!-- ปุ่ม debug -->
+    <button id="btnDebug" class="btn btn-warning mb-3">ดูข้อมูลดิบ (Debug)</button>
 
     <!-- ตารางผลลัพธ์ -->
     <div class="table-responsive">
@@ -66,16 +88,30 @@
   </div>
 
   <script>
+    // ค้นหาเลขประจำตัว
     document.getElementById("searchForm").addEventListener("submit", function(e){
       e.preventDefault();
       const studentId = document.getElementById("studentId").value.trim();
       if (!studentId) return;
+
       google.script.run
         .withSuccessHandler(showResults)
         .withFailureHandler(err => alert("เกิดข้อผิดพลาด: " + err.message))
         .searchStudent(studentId);
     });
 
+    // ปุ่ม debug
+    document.getElementById("btnDebug").addEventListener("click", function(){
+      google.script.run
+        .withSuccessHandler(data => {
+          console.log("ข้อมูลดิบจาก Sheet:", data);
+          alert("เชื่อมต่อสำเร็จ! ดูข้อมูลใน Console (F12)");
+        })
+        .withFailureHandler(err => alert("เกิดข้อผิดพลาด: " + err.message))
+        .getAllData();
+    });
+
+    // แสดงผลตาราง
     function showResults(data) {
       const table = document.getElementById("resultTable");
       const tbody = table.querySelector("tbody");
