@@ -1,141 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-  <base target="_top">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <meta charset="UTF-8">
+  <title>ระบบค้นหาคะแนน</title>
   <style>
     body {
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      min-height: 100vh;
+      font-family: "Sarabun", sans-serif;
+      background: #f7faff;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      font-family: "Prompt", sans-serif;
-      color: #fff;
-    }
-    .card {
-      background: #fff;
-      color: #333;
-      border-radius: 20px;
       padding: 30px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-      width: 95%;
-      max-width: 1100px;
-      text-align: center;
     }
-    h2 { font-weight: 700; color: #1e3c72; margin-bottom: 10px; }
-    p.subtitle { color: #444; margin-bottom: 25px; }
-    #resultTable th {
-      background-color: #1e3c72;
-      color: #fff;
+    h1 {
       text-align: center;
-      vertical-align: middle;
+      color: #0a3d62;
     }
-    #resultTable td {
-      text-align: center;
-      vertical-align: middle;
+    .search-box {
+      margin: 20px 0;
     }
-    .btn-primary {
-      background-color: #2a5298;
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 300px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
       border: none;
-      border-radius: 50px;
-      padding: 10px 25px;
-      transition: 0.3s;
+      border-radius: 8px;
+      background: #0a3d62;
+      color: #fff;
+      cursor: pointer;
     }
-    .btn-primary:hover { background-color: #1e3c72; }
-    .btn-warning { border-radius: 50px; }
-    input.form-control { border-radius: 50px; text-align: center; }
-    @media (max-width: 768px) {
-      .card { padding: 20px; }
-      #resultTable { font-size: 12px; }
+    table {
+      border-collapse: collapse;
+      margin-top: 20px;
+      width: 95%;
+      text-align: center;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background: #1e90ff;
+      color: white;
+    }
+    /* สีเหลืองอ่อน */
+    td.highlight {
+      background: #fffacd;
+      font-weight: bold;
+    }
+    /* สีเหลืองเข้ม */
+    td.highlight-strong {
+      background: #ffd700;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Checkpoints</h2>
-    <p class="subtitle">คะแนนเก็บ วิชาสังคมศึกษา รหัสวิชา ส32101</p>
+  <h1>ระบบค้นหาคะแนนนักเรียน</h1>
 
-    <!-- ฟอร์มค้นหา -->
-    <form id="searchForm" class="row g-3 justify-content-center mb-4">
-      <div class="col-12 col-md-6">
-        <input type="text" id="studentId" class="form-control" placeholder="🔍 กรอกเลขประจำตัวนักเรียน">
-      </div>
-      <div class="col-12 col-md-3">
-        <button type="submit" class="btn btn-primary w-100">ค้นหา</button>
-      </div>
-    </form>
-
-    <!-- ปุ่ม debug -->
-    <button id="btnDebug" class="btn btn-warning mb-3">ดูข้อมูลดิบ (Debug)</button>
-
-    <!-- ตารางผลลัพธ์ -->
-    <div class="table-responsive">
-      <table id="resultTable" class="table table-bordered table-striped d-none">
-        <thead>
-          <tr>
-            <th>ห้อง</th><th>เลขที่</th><th>เลขประจำตัว</th><th>ชื่อ-สกุล</th>
-            <th>สมุด</th><th>ส1</th><th>ต้มยำ</th><th>รวม1</th>
-            <th>ช10</th><th>ผล5</th><th>ประยุกต์</th><th>รวม2</th>
-            <th>รวม3</th><th>ส20</th><th>ซ่อม</th><th>รวม4</th>
-            <th>ชุมชน</th><th>RCEP</th><th>รวม5</th><th>Test</th>
-            <th>ใบงาน</th><th>รวม6</th><th>รวม7</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+  <div class="search-box">
+    <input type="text" id="searchQuery" placeholder="พิมพ์ชื่อ หรือ เลขประจำตัว">
+    <button onclick="searchData()">ค้นหา</button>
   </div>
 
+  <table id="resultTable"></table>
+
   <script>
-    // ค้นหาเลขประจำตัว
-    document.getElementById("searchForm").addEventListener("submit", function(e){
-      e.preventDefault();
-      const studentId = document.getElementById("studentId").value.trim();
-      if (!studentId) return;
+    function searchData() {
+      const query = document.getElementById("searchQuery").value.trim();
+      if (!query) return alert("กรุณากรอกคำค้นหา");
 
-      google.script.run
-        .withSuccessHandler(showResults)
-        .withFailureHandler(err => alert("เกิดข้อผิดพลาด: " + err.message))
-        .searchStudent(studentId);
-    });
+      google.script.run.withSuccessHandler(displayResults).searchStudent(query);
+    }
 
-    // ปุ่ม debug
-    document.getElementById("btnDebug").addEventListener("click", function(){
-      google.script.run
-        .withSuccessHandler(data => {
-          console.log("ข้อมูลดิบจาก Sheet:", data);
-          alert("เชื่อมต่อสำเร็จ! ดูข้อมูลใน Console (F12)");
-        })
-        .withFailureHandler(err => alert("เกิดข้อผิดพลาด: " + err.message))
-        .getAllData();
-    });
-
-    // แสดงผลตาราง
-    function showResults(data) {
+    function displayResults(data) {
       const table = document.getElementById("resultTable");
-      const tbody = table.querySelector("tbody");
-      tbody.innerHTML = "";
+      table.innerHTML = "";
 
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="23" class="text-center text-danger">❌ ไม่พบข้อมูล</td></tr>`;
-      } else {
-        data.forEach(row => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${row["ห้อง"]||""}</td><td>${row["เลขที่"]||""}</td><td>${row["เลขประจำตัว"]||""}</td>
-            <td>${row["ชื่อ-สกุล"]||""}</td><td>${row["สมุด"]||""}</td><td>${row["ส1"]||""}</td>
-            <td>${row["ต้มยำ"]||""}</td><td>${row["รวม1"]||""}</td><td>${row["ช10"]||""}</td>
-            <td>${row["ผล5"]||""}</td><td>${row["ประยุกต์"]||""}</td><td>${row["รวม2"]||""}</td>
-            <td>${row["รวม3"]||""}</td><td>${row["ส20"]||""}</td><td>${row["ซ่อม"]||""}</td>
-            <td>${row["รวม4"]||""}</td><td>${row["ชุมชน"]||""}</td><td>${row["RCEP"]||""}</td>
-            <td>${row["รวม5"]||""}</td><td>${row["Test"]||""}</td><td>${row["ใบงาน"]||""}</td>
-            <td>${row["รวม6"]||""}</td><td>${row["รวม7"]||""}</td><td>${row["รวม8"]||""}</td>
-          `;
-          tbody.appendChild(tr);
-        });
+        table.innerHTML = "<tr><td>ไม่พบข้อมูล</td></tr>";
+        return;
       }
-      table.classList.remove("d-none");
+
+      // สร้างหัวตาราง
+      const headers = [
+        "ห้อง", "เลขที่", "เลขประจำตัว", "ชื่อ-สกุล", "สมุด",
+        "สอบ1", "ต้มยำกุ้ง", "รวม1", "ชิ้นงาน10", "ผล5",
+        "ประยุกต์", "รวม2", "รวม3", "สอบ20", "กลางภาค",
+        "รวม4", "ชุมชน", "RCEP", "รวม5", "Test", "ใบงาน",
+        "รวม6", "รวม7", "รวม80"
+      ];
+
+      let thead = "<tr>";
+      headers.forEach(h => thead += `<th>${h}</th>`);
+      thead += "</tr>";
+      table.innerHTML += thead;
+
+      // หาคอลัมน์ที่ต้องไฮไลต์
+      const highlightCols = ["รวม1","รวม2","กลางภาค","รวม5","รวม6"];
+      const strongCols = ["รวม80"];
+
+      // เติมข้อมูล
+      data.slice(1).forEach(row => {
+        let tr = "<tr>";
+        headers.forEach((h, idx) => {
+          let val = row[idx] !== undefined ? row[idx] : "";
+          let cls = "";
+          if (highlightCols.includes(h)) cls = "highlight";
+          if (strongCols.includes(h)) cls = "highlight-strong";
+          tr += `<td class="${cls}">${val}</td>`;
+        });
+        tr += "</tr>";
+        table.innerHTML += tr;
+      });
     }
   </script>
 </body>
