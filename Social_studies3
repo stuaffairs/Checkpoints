@@ -8,6 +8,7 @@
   <h2 class="mb-4">Checkpoints</h2>
   <p>คะแนนเก็บ วิชาสังคมศึกษา รหัสวิชา ส32101</p>
 
+  <!-- ฟอร์มค้นหา -->
   <form id="searchForm" class="row g-3 mb-4">
     <div class="col-auto">
       <input type="text" id="studentId" class="form-control" placeholder="กรอกเลขประจำตัวนักเรียน">
@@ -17,6 +18,7 @@
     </div>
   </form>
 
+  <!-- ตารางผลลัพธ์ -->
   <table id="resultTable" class="table table-bordered table-striped d-none">
     <thead>
       <tr>
@@ -49,14 +51,15 @@
   </table>
 
   <script>
+    // เมื่อกดค้นหา
     document.getElementById("searchForm").addEventListener("submit", function(e){
       e.preventDefault();
       const studentId = document.getElementById("studentId").value.trim();
       if (!studentId) return;
-
       google.script.run.withSuccessHandler(showResults).searchStudent(studentId);
     });
 
+    // แสดงผลข้อมูลในตาราง
     function showResults(data) {
       const table = document.getElementById("resultTable");
       const tbody = table.querySelector("tbody");
