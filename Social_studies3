@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ค้นหาคะแนนเก็บนักเรียน</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: "Prompt", sans-serif;
+      background: #f0f8ff;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 { color: #003366; }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+    button {
+      background: #003366;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover { background: #0055aa; }
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: none;
+      text-align: left;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>ค้นหาคะแนนเก็บนักเรียน</h1>
+  <input type="text" id="studentId" placeholder="กรอกรหัสประจำตัว" />
+  <button onclick="search()">ค้นหา</button>
+
+  <div id="result"></div>
+
+  <script>
+    function search() {
+      const studentId = document.getElementById("studentId").value.trim();
+      if (!studentId) {
+        Swal.fire("แจ้งเตือน", "กรุณากรอกรหัสประจำตัว", "warning");
+        return;
+      }
+
+      Swal.fire({
+        title: "กำลังค้นหา...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      google.script.run.withSuccessHandler(function(data) {
+        Swal.close();
+        const resultDiv = document.getElementById("result");
+        if (data) {
+          let html = "<h3>ข้อมูลนักเรียน</h3>";
+          for (let key in data) {
+            html += `<p><b>${key}:</b> ${data[key]}</p>`;
+          }
+          resultDiv.innerHTML = html;
+          resultDiv.style.display = "block";
+        } else {
+          Swal.fire("ไม่พบข้อมูล", "กรุณาตรวจสอบรหัสประจำตัวอีกครั้ง", "error");
+          resultDiv.style.display = "none";
+        }
+      }).searchScore(studentId);
+    }
+  </script>
+</body>
+</html>
