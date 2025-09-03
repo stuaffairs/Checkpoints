@@ -23,38 +23,13 @@
       max-width: 1000px;
       text-align: center;
     }
-    h2 {
-      font-weight: 700;
-      color: #1e3c72;
-      margin-bottom: 10px;
-    }
-    p.subtitle {
-      color: #444;
-      margin-bottom: 25px;
-    }
-    #resultTable th {
-      background-color: #1e3c72;
-      color: #fff;
-      text-align: center;
-    }
-    #resultTable td {
-      text-align: center;
-      vertical-align: middle;
-    }
-    .btn-primary {
-      background-color: #2a5298;
-      border: none;
-      border-radius: 50px;
-      padding: 10px 25px;
-      transition: 0.3s;
-    }
-    .btn-primary:hover {
-      background-color: #1e3c72;
-    }
-    input.form-control {
-      border-radius: 50px;
-      text-align: center;
-    }
+    h2 { font-weight: 700; color: #1e3c72; margin-bottom: 10px; }
+    p.subtitle { color: #444; margin-bottom: 25px; }
+    #resultTable th { background-color: #1e3c72; color: #fff; text-align: center; }
+    #resultTable td { text-align: center; vertical-align: middle; }
+    .btn-primary { background-color: #2a5298; border: none; border-radius: 50px; padding: 10px 25px; transition: 0.3s; }
+    .btn-primary:hover { background-color: #1e3c72; }
+    input.form-control { border-radius: 50px; text-align: center; }
   </style>
 </head>
 <body>
@@ -77,29 +52,12 @@
       <table id="resultTable" class="table table-bordered table-striped d-none">
         <thead>
           <tr>
-            <th>ห้อง</th>
-            <th>เลขที่</th>
-            <th>เลขประจำตัว</th>
-            <th>ชื่อ-สกุล</th>
-            <th>สมุด</th>
-            <th>ส1</th>
-            <th>ต้มยำ</th>
-            <th>รวม1</th>
-            <th>ช10</th>
-            <th>ผล5</th>
-            <th>ประยุกต์</th>
-            <th>รวม2</th>
-            <th>รวม3</th>
-            <th>ส20</th>
-            <th>ซ่อม</th>
-            <th>รวม4</th>
-            <th>ชุมชน</th>
-            <th>RCEP</th>
-            <th>รวม5</th>
-            <th>Test</th>
-            <th>ใบงาน</th>
-            <th>รวม6</th>
-            <th>รวม7</th>
+            <th>ห้อง</th><th>เลขที่</th><th>เลขประจำตัว</th><th>ชื่อ-สกุล</th>
+            <th>สมุด</th><th>ส1</th><th>ต้มยำ</th><th>รวม1</th>
+            <th>ช10</th><th>ผล5</th><th>ประยุกต์</th><th>รวม2</th>
+            <th>รวม3</th><th>ส20</th><th>ซ่อม</th><th>รวม4</th>
+            <th>ชุมชน</th><th>RCEP</th><th>รวม5</th><th>Test</th>
+            <th>ใบงาน</th><th>รวม6</th><th>รวม7</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -108,15 +66,16 @@
   </div>
 
   <script>
-    // เมื่อกดค้นหา
     document.getElementById("searchForm").addEventListener("submit", function(e){
       e.preventDefault();
       const studentId = document.getElementById("studentId").value.trim();
       if (!studentId) return;
-      google.script.run.withSuccessHandler(showResults).searchStudent(studentId);
+      google.script.run
+        .withSuccessHandler(showResults)
+        .withFailureHandler(err => alert("เกิดข้อผิดพลาด: " + err.message))
+        .searchStudent(studentId);
     });
 
-    // แสดงผลข้อมูลในตาราง
     function showResults(data) {
       const table = document.getElementById("resultTable");
       const tbody = table.querySelector("tbody");
@@ -128,29 +87,14 @@
         data.forEach(row => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${row["ห้อง"] || ""}</td>
-            <td>${row["เลขที่"] || ""}</td>
-            <td>${row["เลขประจำตัว"] || ""}</td>
-            <td>${row["ชื่อ-สกุล"] || ""}</td>
-            <td>${row["สมุด"] || ""}</td>
-            <td>${row["ส1"] || ""}</td>
-            <td>${row["ต้มยำ"] || ""}</td>
-            <td>${row["รวม1"] || ""}</td>
-            <td>${row["ช10"] || ""}</td>
-            <td>${row["ผล5"] || ""}</td>
-            <td>${row["ประยุกต์"] || ""}</td>
-            <td>${row["รวม2"] || ""}</td>
-            <td>${row["รวม3"] || ""}</td>
-            <td>${row["ส20"] || ""}</td>
-            <td>${row["ซ่อม"] || ""}</td>
-            <td>${row["รวม4"] || ""}</td>
-            <td>${row["ชุมชน"] || ""}</td>
-            <td>${row["RCEP"] || ""}</td>
-            <td>${row["รวม5"] || ""}</td>
-            <td>${row["Test"] || ""}</td>
-            <td>${row["ใบงาน"] || ""}</td>
-            <td>${row["รวม6"] || ""}</td>
-            <td>${row["รวม7"] || ""}</td>
+            <td>${row["ห้อง"]||""}</td><td>${row["เลขที่"]||""}</td><td>${row["เลขประจำตัว"]||""}</td>
+            <td>${row["ชื่อ-สกุล"]||""}</td><td>${row["สมุด"]||""}</td><td>${row["ส1"]||""}</td>
+            <td>${row["ต้มยำ"]||""}</td><td>${row["รวม1"]||""}</td><td>${row["ช10"]||""}</td>
+            <td>${row["ผล5"]||""}</td><td>${row["ประยุกต์"]||""}</td><td>${row["รวม2"]||""}</td>
+            <td>${row["รวม3"]||""}</td><td>${row["ส20"]||""}</td><td>${row["ซ่อม"]||""}</td>
+            <td>${row["รวม4"]||""}</td><td>${row["ชุมชน"]||""}</td><td>${row["RCEP"]||""}</td>
+            <td>${row["รวม5"]||""}</td><td>${row["Test"]||""}</td><td>${row["ใบงาน"]||""}</td>
+            <td>${row["รวม6"]||""}</td><td>${row["รวม7"]||""}</td>
           `;
           tbody.appendChild(tr);
         });
